@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3 個全球美食推薦</title>
+    <style>
+        /* Base page styling */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 40px 20px;
+        }
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 40px;
+        }
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 25px;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        
+        /* Card styling */
+        .food-card {
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+            width: 220px;
+            padding: 25px;
+            text-align: center;
+            transition: transform 0.2s, box-shadow 0.2s;
+            cursor: pointer;
+        }
+        .food-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+        }
+        .food-card h2 {
+            color: #e67e22;
+            margin: 10px 0 5px 0;
+            font-size: 1.5rem;
+        }
+        .food-card h3 {
+            color: #34495e;
+            margin: 0 0 15px 0;
+            font-size: 1.1rem;
+        }
+        .food-card p {
+            color: #7f8c8d;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            margin: 0;
+            text-align: left;
+        }
+        .emoji {
+            font-size: 50px;
+            margin-bottom: 10px;
+        }
+
+        /* Popup (Modal) Styling */
+        .modal {
+            display: none; 
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6); 
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .modal-content {
+            background-color: #fff;
+            padding: 20px 20px 30px 20px;
+            border-radius: 12px;
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+            position: relative;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+        .modal-content img {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-top: 10px;
+            margin-bottom: 15px;
+        }
+        .modal-content h3 {
+            color: #e67e22;
+            margin-top: 15px;
+            margin-bottom: 10px;
+            font-size: 1.5rem;
+        }
+
+        /* Clickable Map Button styling */
+        #modalLocation {
+            display: inline-block;
+            color: #3498db;
+            font-weight: bold;
+            font-size: 1rem;
+            text-decoration: none;
+            padding: 10px 15px;
+            border: 2px solid #3498db;
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+        #modalLocation:hover {
+            background-color: #3498db;
+            color: white;
+            box-shadow: 0 4px 8px rgba(52, 152, 219, 0.3);
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 24px;
+            color: #7f8c8d;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .close-btn:hover {
+            color: #e74c3c;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>🌎 3 個全球美食推薦</h1>
+
+    <div class="container">
+        
+        <div class="food-card" 
+             data-img="https://framerusercontent.com/images/0sinvSQPwcLwOvEPFL34es7AB8.png?width=2000&height=1316" 
+             data-loc="📍 Phnom Penh, Cambodia (金邊)"
+             data-map="https://www.google.com/maps/search/Lok+Lak+Phnom+Penh">
+            <div class="emoji">🍛</div>
+            <h2>柬埔寨</h2>
+            <h3>柬式牛肉粒飯</h3>
+            <p>柬式牛肉粒飯（Lok Lak）是一道經典家常料理。切成小塊的牛肉用醬油、魚露、蒜末和黑胡椒醃製，再以大火快炒。它最大的特色是濃厚的黑胡椒香氣與鹹香帶點微甜的醬汁，非常下飯。</p>
+        </div>
+
+        <div class="food-card" 
+             data-img="https://img.taste.com.au/bJGGTjzJ/taste/2017/01/vietnamese-spicy-meatball-banh-mi-120038-2.jpg" 
+             data-loc="📍 Ho Chi Minh City, Vietnam (胡志明市)"
+             data-map="https://www.google.com/maps/search/Banh+Mi+Ho+Chi+Minh">
+            <div class="emoji">🥖</div>
+            <h2>越南</h2>
+            <h3>越式麵包</h3>
+            <p>越南麵包（Bánh mì）融合東西方特色。以外酥內軟的法棍為基底，夾入烤豬肉、火腿或煎蛋，再搭配新鮮香菜、小黃瓜、醃蘿蔔與紅蘿蔔，最後淋上特製醬料，口感層次分明。</p>
+        </div>
+
+        <div class="food-card" 
+             data-img="https://ianbenites.com/wp-content/uploads/2021/05/20210511_183402-1.jpg" 
+             data-loc="📍 Bangkok, Thailand (曼谷)"
+             data-map="https://www.google.com/maps/search/Som+Tum+Bangkok">
+            <div class="emoji">🌶️</div>
+            <h2>泰國</h2>
+            <h3>涼拌木瓜</h3>
+            <p>泰式涼拌青木瓜絲（Som Tum）是一道酸辣開胃的經典小吃。加入花生、番茄、長豆、蝦米，並拌入魚露、檸檬汁、辣椒和椰糖搗碎入味，口感清脆，酸甜微辣，非常消暑！</p>
+        </div>
+
+    </div>
+
+    <div id="foodModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn">&times;</span>
+            <h3 id="modalTitle">Food Name</h3>
+            <img id="modalImage" src="" alt="Food Picture">
+            <br>
+            <a id="modalLocation" href="#" target="_blank">📍 Location</a>
+        </div>
+    </div>
+
+    <script>
+        const cards = document.querySelectorAll('.food-card');
+        const modal = document.getElementById('foodModal');
+        const modalImage = document.getElementById('modalImage');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalLocation = document.getElementById('modalLocation');
+        const closeBtn = document.querySelector('.close-btn');
+
+        cards.forEach(card => {
+            card.addEventListener('click', () => {
+                // Get data from the clicked card
+                const foodName = card.querySelector('h3').innerText;
+                const imgSrc = card.getAttribute('data-img');
+                const locationText = card.getAttribute('data-loc');
+                const mapLink = card.getAttribute('data-map'); 
+
+                // Put the data into the popup
+                modalTitle.innerText = foodName;
+                modalImage.src = imgSrc;
+                modalLocation.innerText = locationText;
+                modalLocation.href = mapLink; 
+
+                // Show the popup
+                modal.style.display = 'flex';
+            });
+        });
+
+        // Close popup when the 'X' is clicked
+        closeBtn.addEventListener('click', () => {
+            modal.style.display = 'none';
+        });
+
+        // Close popup if you click anywhere outside the white box
+        window.addEventListener('click', (event) => {
+            if (event.target === modal) {
+                modal.style.display = 'none';
+            }
+        });
+    </script>
+
+</body>
+</html>
