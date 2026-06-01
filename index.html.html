@@ -3,52 +3,133 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>3 個全球美食推薦</title>
+<title>東越泰 三國美食推廣 - 3D 浮雕地圖完整版</title>
 
 <style>
+* {
+    box-sizing: border-box;
+}
 
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #f8f9fa;
     margin: 0;
-    padding: 40px 20px;
-}
+    padding: 0;
+    min-height: 100vh;
+    width: 100vw;
+    overflow-x: hidden;
 
-h1 {
-    text-align: center;
-    color: #2c3e50;
-    margin-bottom: 40px;
-}
+    /* 讓完整海報填滿整個螢幕背景 */
+    background-image: linear-gradient(rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.4)), url('images\11.png');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    background-repeat: no-repeat;
 
-.container {
     display: flex;
-    flex-wrap: wrap;
+    flex-direction: column;
+    align-items: center;
     justify-content: center;
-    gap: 25px;
-    max-width: 1000px;
-    margin: 0 auto;
 }
 
-.food-card {
-    background-color: #ffffff;
-    border-radius: 12px;
-    box-shadow: 0 6px 12px rgba(0,0,0,0.1);
-    width: 220px;
-    padding: 25px;
-    text-align: center;
+/* 覆蓋於畫面中央的按鈕容器層 */
+.map-container {
+    position: relative;
+    width: 100%;
+    max-width: 1400px;
+    height: 600px;
+    margin-top: 40px;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    padding: 0 50px;
+}
+
+/* 獨立的立體浮雕國家框架按鈕 */
+.country-frame-btn {
+    position: relative;
+    width: 340px;
+    height: 450px;
+    background-color: rgba(243, 230, 206, 0.9); /* 復古羊皮紙色半透明底座 */
+    border-radius: 20px;
     cursor: pointer;
-    transition: 0.3s;
+    
+    /* 3D 浮雕與陰影設計 */
+    border: 4px solid #b8975a; 
+    box-shadow: 
+        0 15px 35px rgba(0,0,0,0.4),            
+        inset 0 0 20px rgba(184, 151, 90, 0.3),  
+        0 0 0 8px rgba(0, 0, 0, 0.2);            
+        
+    transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1), box-shadow 0.4s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 25px 20px;
+    overflow: hidden;
 }
 
-.food-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+/* 滑鼠懸停時卡片拔起與發光特效 */
+.country-frame-btn:hover {
+    transform: translateY(-15px) scale(1.03);
+    box-shadow: 
+        0 30px 50px rgba(0,0,0,0.6), 
+        inset 0 0 30px rgba(230, 180, 80, 0.5),
+        0 0 20px rgba(241, 196, 15, 0.4);
+    border-color: #f1c40f; 
 }
+
+/* 利用去背地形圖作為卡片內的焦點 */
+.terrain-graphics {
+    width: 100%;
+    height: 240px;
+    background-image: url('file_00000000e0bc72079981569fc8369855.png');
+    background-repeat: no-repeat;
+    background-size: 320% auto; 
+    
+    /* 讓地形圖在框架內產生浮雕邊緣陰影 */
+    filter: drop-shadow(0 8px 12px rgba(0,0,0,0.45));
+    transition: transform 0.4s ease, filter 0.4s ease;
+}
+
+.country-frame-btn:hover .terrain-graphics {
+    transform: scale(1.08);
+    filter: drop-shadow(0 12px 18px rgba(0,0,0,0.6)) brightness(1.1);
+}
+
+/* 精準擷取第二張去背圖中的三國地理形狀 */
+.cambodia-map { background-position: 2% 43%; }
+.vietnam-map { background-position: 50% 43%; }
+.thailand-map { background-position: 98% 43%; }
 
 .emoji {
-    font-size: 50px;
+    font-size: 32px;
+    margin-bottom: 5px;
 }
 
+.country-title {
+    margin: 10px 0 2px 0;
+    font-size: 28px;
+    font-weight: bold;
+    color: #2c3e50;
+    letter-spacing: 2px;
+}
+
+.country-subtitle {
+    margin: 0;
+    font-size: 16px;
+    color: #e67e22;
+    font-weight: 600;
+}
+
+.country-hint {
+    margin-top: auto;
+    font-size: 13px;
+    color: #7f8c8d;
+    font-style: italic;
+}
+
+/* Modals 彈窗樣式 */
 .modal {
     display: none;
     position: fixed;
@@ -56,7 +137,7 @@ h1 {
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0,0,0,0.6);
+    background-color: rgba(0,0,0,0.7);
     justify-content: center;
     align-items: center;
     z-index: 1000;
@@ -64,466 +145,376 @@ h1 {
 
 .modal-content {
     background-color: #fff;
-    padding: 20px;
-    border-radius: 12px;
-    max-width: 500px;
+    padding: 30px 25px;
+    border-radius: 16px;
+    max-width: 550px;
     width: 90%;
     text-align: center;
     position: relative;
-    max-height: 80vh;
+    max-height: 85vh;
     overflow-y: auto;
+    line-height: 1.6;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+}
+
+.modal-content h3 {
+    font-size: 24px;
+    color: #2c3e50;
+    margin-top: 0;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #f1c40f;
+    padding-bottom: 10px;
 }
 
 .modal-content img {
     width: 100%;
-    height: 180px;
+    height: 200px;
     object-fit: cover;
     border-radius: 8px;
+    margin-top: 10px;
 }
 
 .food-item {
-    margin-bottom: 25px;
+    margin-bottom: 30px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 20px;
+    text-align: left;
+}
+
+.food-item:last-child { 
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
 }
 
 .food-item h4 {
-    margin: 10px 0;
-    color: #e67e22;
+    margin: 0 0 10px 0;
+    color: #d35400;
+    font-size: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
 .food-item a {
     display: inline-block;
-    margin-top: 5px;
+    margin-top: 10px;
     color: #3498db;
     text-decoration: none;
+    font-weight: 600;
+    font-size: 14px;
 }
+.food-item a:hover { text-decoration: underline; }
 
-.close-btn,
-.detail-close-btn {
+.close-btn, .detail-close-btn {
     position: absolute;
-    top: 10px;
-    right: 15px;
-    font-size: 28px;
+    top: 12px;
+    right: 20px;
+    font-size: 32px;
     cursor: pointer;
+    color: #95a5a6;
+    transition: color 0.2s;
+    line-height: 1;
 }
+.close-btn:hover, .detail-close-btn:hover { color: #34495e; }
 
 .food-image {
     cursor: pointer;
-    transition: 0.3s;
+    transition: transform 0.3s ease;
 }
+.food-image:hover { transform: scale(1.02); }
 
-.food-image:hover {
-    transform: scale(1.03);
-}
-
-/* Detail Modal */
-
+/* Detail Modal 第二層詳細規格 */
 .detail-content {
     max-width: 650px;
     background: linear-gradient(135deg, #fff7e6, #ffe0b2);
-    animation: popup 0.3s ease;
+    animation: popup 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
 .detail-content img {
     width: 100%;
-    height: 320px;
+    height: 340px;
     object-fit: cover;
     border-radius: 12px;
     margin-bottom: 15px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.15);
 }
 
-#detailTitle {
-    color: #d35400;
-    margin-bottom: 10px;
-}
-
-#detailText {
-    font-size: 16px;
-    line-height: 1.7;
-    color: #444;
-}
+#detailTitle { color: #d35400; margin-bottom: 15px; font-size: 26px; text-align: center; }
+#detailText { font-size: 16px; line-height: 1.7; color: #444; text-align: left; white-space: pre-line; }
 
 @keyframes popup {
-    from {
-        transform: scale(0.7);
-        opacity: 0;
-    }
-
-    to {
-        transform: scale(1);
-        opacity: 1;
-    }
+    from { transform: scale(0.8); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
 }
 
+/* 響應式手機板調整 */
+@media(max-width: 1024px) {
+    .map-container {
+        flex-direction: column;
+        height: auto;
+        gap: 40px;
+        padding: 40px 20px;
+    }
+}
 </style>
 </head>
-
 <body>
 
-<h1>🌎 3 個全球美食推薦</h1>
+<div class="map-container">
 
-<div class="container">
-
-    <!-- Cambodia -->
-    <div class="food-card"
-    data-foods='[
+    <div class="country-frame-btn" data-foods='[
         {
             "name":"柬式牛肉粒飯",
             "img":"https://framerusercontent.com/images/0sinvSQPwcLwOvEPFL34es7AB8.png?width=2000&height=1316",
             "loc":"📍 Taiwan,Taibei,taoyuan",
             "map":"https://www.google.com/maps/search/柬埔寨+小吃",
             "detailImg":"https://i.ytimg.com/vi/n8E5-rlEHZU/maxresdefault.jpg",
-            "desc":"柬式牛肉粒飯（Lok Lak，高棉語：ឡុកឡាក់សាច់គោ）是柬埔寨最經典的國民美食之一，受法國殖民影響，將牛肉切成骰子狀快炒，口感鮮嫩多汁，通常搭配青檸黑胡椒沾醬，風味獨特。做法：肉： 牛肉切粒，用蠔油、生抽、糖、生粉醃 20 分鐘。醬： 準備一碟「檸檬汁 + 黑胡椒 + 鹽」做沾醬。盤底鋪滿生菜、番茄、小黃瓜，旁邊放白飯和荷包蛋。大火熱油，牛肉下鍋快炒至表面焦香，加入番茄醬、蠔油翻勻收汁，立刻起鍋蓋在生菜上。靈魂吃法： 牛肉一定要蘸那個「檸檬胡椒醬」吃！"
+            "desc":"柬式牛肉粒飯（Lok Lak，高棉語：ឡុកឡាក់សាច់គោ）是柬埔寨最經典的國民美食之一，受法國殖民影響，將牛肉切成骰子狀快炒，口感鮮嫩多汁，通常搭配青檸黑胡椒沾醬，風味獨特。\n\n做法：\n1. 肉： 牛肉切粒，用蠔油、生抽、糖、生粉醃 20 分鐘。\n2. 醬： 準備一碟「檸檬汁 + 黑胡椒 + 鹽」做沾醬。\n3. 盤底鋪滿生菜、番茄、小黃瓜，旁邊放白飯和荷包蛋。\n4. 大火熱油，牛肉下鍋快炒至表面焦香，加入番茄醬、蠔油翻勻收汁，立刻起鍋蓋在生菜上。\n\n靈魂吃法： 牛肉一定要蘸那個「檸檬胡椒醬」吃！"
         },
-
         {
             "name":"高棉咖哩",
             "img":"https://media-cdn.tripadvisor.com/media/photo-s/12/95/e0/92/our-local-s-signature.jpg",
             "loc":"📍 Taiwan,Taibei,taoyuan",
             "map":"https://www.google.com/maps/search/柬埔寨+小吃",
             "detailImg":"https://img.delicious.com.au/qomhapkW/del/2017/08/cambodian-lamb-curry-50524-2.jpg",
-            "desc":"高棉咖哩味道較溫和，通常搭配椰奶與雞肉。做咖哩醬 (Kroeung)：將香茅、南薑、黃薑、檸檬葉、蒜頭、紅蔥頭搗碎成泥（或用攪拌機打碎）。炒香醬泥，加入雞肉（或魚肉）、椰奶、魚露、棕櫚糖。起鍋前淋上一層濃椰漿，拌入少許花生碎。"
+            "desc":"高棉咖哩味道較溫和，通常搭配椰奶與雞肉。\n\n做法：\n1. 做咖哩醬 (Kroeung)：將香茅、南薑、黃薑、檸檬葉、蒜頭、紅蔥頭搗碎成泥（或用攪拌機打碎）。\n2. 炒香醬泥，加入雞肉（或魚肉）、椰奶、魚露、棕櫚糖。\n3. 起鍋前淋上一層濃椰漿，拌入少許花生碎。"
         },
-
         {
             "name":"Amok（阿莫克魚）",
             "img":"https://passionate-travel.com/wp-content/uploads/2022/12/khmer-amok-river-fish.jpg",
             "loc":"📍 Taiwan,Taibei,taoyuan",
             "map":"https://www.google.com/maps/search/柬埔寨+小吃",
             "detailImg":"https://changkrankhmer.opte.io/wp-content/uploads/sites/3113/2023/04/cambodian-fish-amok.jpg",
-            "desc":"這是柬埔寨最著名的國菜，特色是口感像蛋羹（Custard），香氣濃郁卻不辣。做法：香茅、南薑、黃薑、檸檬葉、蒜頭打成泥，與椰奶、雞蛋、魚露、棕櫚糖攪拌均勻。將去骨白肉魚塊放入醬汁中醃漬。 將魚和醬汁倒入香蕉葉做的碗中，上面放幾片大非牛葉 (Slok Ngor) 或檸檬葉絲，蒸 20 分鐘至凝固。"
+            "desc":"這是柬埔寨最著名的國菜，特色是口感像蛋羹（Custard），香氣濃郁卻不辣。\n\n做法：\n1. 香茅、南薑、黃薑、檸檬葉、蒜頭打成泥，與椰奶、雞蛋、魚露、棕櫚糖攪拌均勻。\n2. 將去骨白肉魚塊放入醬汁中醃漬。\n3. 將魚和醬汁倒入香蕉葉做的碗中，上面放幾片大非牛葉 (Slok Ngor) 或檸檬葉絲，蒸 20 分鐘至凝固。"
         },
-
         {
             "name":"南瓜布丁",
             "img":"https://thidaskitchen.com/wp-content/uploads/2022/12/buttercup-squash-custard-.jpg",
             "loc":"📍 Taiwan,Taibei,taoyuan",
             "map":"https://www.google.com/maps/search/柬埔寨+小吃",
             "detailImg":"https://www.tasteatlas.com/images/dishes/0791dc9b6f494ee09a196d8e82ccc49e.jpg",
-            "desc":"這道 Sankhya Lapov 是柬埔寨最經典的甜點，將香甜的椰奶蛋液直接注入南瓜內蒸熟，口感像紮實的燉蛋（Custard）挑選一顆小型南瓜（如東昇南瓜），從頂部切開蓋子，挖除種子，洗淨抹乾。混合 3 顆雞蛋、200ml 濃椰奶、適量棕櫚糖（或紅糖）及少許鹽。關鍵技巧： 慢慢攪拌均勻，避免產生過多氣泡，最後用濾網過濾一次，口感會更滑嫩。將蛋液倒入南瓜中（裝 8 分滿，因為蒸了會膨脹）。水滾後，中火蒸 30-45 分鐘（視南瓜大小而定）。"
+            "desc":"這道 Sankhya Lapov 是柬埔寨最經典的甜點，將香甜的椰奶蛋液直接注入南瓜內蒸熟，口感像紮實的燉蛋（Custard）。\n\n做法：\n1. 挑選一顆小型南瓜（如東昇南瓜），從頂部切開蓋子，挖除種子，洗淨抹乾。\n2. 混合 3 顆雞蛋、200ml 濃椰奶、適量棕櫚糖（或紅糖）及少許鹽。\n3. 關鍵技巧： 慢慢攪拌均勻，避免產生過多氣泡，最後用濾網過濾一次，口感會更滑嫩。\n4. 將蛋液倒入南瓜中（裝 8 分滿，因為蒸了會膨脹）。\n5. 水滾後，中火蒸 30-45 分鐘（視南瓜大小而定）。"
         },
-
         {
             "name":"彩色椰奶甜品",
             "img":"https://i0.wp.com/liloneoftheashes.com/wp-content/uploads/2023/05/NonyaSaturdayBrunch11.jpg?fit=750%2C562&ssl=1",
             "loc":"📍 Taiwan,Taibei,taoyuan",
             "map":"https://www.google.com/maps/search/柬埔寨+小吃",
             "detailImg":"https://foodieatlas.com/cambodia/cha-houy-teuk/cha-houy-teuk-large.webp",
-            "desc":"柬埔寨街頭最常見的彩色果凍冰。它的特色在於豐富的口感（脆、滑）與濃郁的椰香。用洋菜粉（海菜粉）加水和糖煮開。分成幾份，加入斑蘭葉汁（綠）、紅石榴（紅）或食物色素。冷卻凝固後切成小方塊或條狀。煮熟的西米露、紅豆、芋頭丁或波羅蜜絲。濃椰奶混合棕櫚糖水，加少許鹽提味。碗裡先放滿彩色果凍和各種配料。淋上糖水和椰奶。"
+            "desc":"柬埔寨街頭最常見的彩色果凍冰。它的特色在於豐富的口感（脆、滑）與濃郁的椰香。\n\n做法：\n1. 用洋菜粉（海菜粉）加水和糖煮開。分成幾份，加入斑蘭葉汁（綠）、紅石榴（紅）或食物色素。冷卻凝固後切成小方塊或條狀。\n2. 準備好煮熟的西米露、紅豆、芋頭丁或波羅蜜絲。\n3. 濃椰奶混合棕櫚糖水，加少許鹽提味。\n4. 碗裡先放滿彩色果凍和各種配料，最後淋上糖水和椰奶。"
         },
-
         {
             "name":"甘蔗汁",
             "img":"https://www.merit-times.com/newsimport/%E7%A6%8F%E5%A0%B1%E9%9B%BB%E5%AD%90%E5%A0%B1_120260326061003/images/67378205_l_tmp202603261549483500154957.webp",
             "loc":"📍 Taiwan,Taibei,taoyuan",
             "map":"https://www.google.com/maps/search/柬埔寨+小吃",
             "detailImg":"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSRqZV84h8jwBKJ621S9hRjnqQp6HYRDJ45Ug&s",
-            "desc":"柬埔寨街頭，甘蔗汁 (Teuk Ampov) 是國民級的消暑神湯。它和我們平常喝的甘蔗汁最大的不同在於加入了一種「靈魂配料」柬埔寨人壓榨甘蔗時，會同時塞入 1-2 顆酸柑（小青檸，Limes）一起壓榨。酸味能中和甘蔗的甜膩，並防止甘蔗汁迅速氧化變黑，讓色澤保持翠綠。必須搭配滿滿一袋或一瓶的碎冰，在熱帶氣候下喝起來極其清爽。"
+            "desc":"柬埔寨街頭，甘蔗汁 (Teuk Ampov) 是國民級的消暑神湯。它和我們平常喝的甘蔗汁最大的不同在於加入了一種「靈魂配料」。\n\n特色：\n柬埔寨人壓榨甘蔗時，會同時塞入 1-2 顆酸柑（小青檸，Limes）一起壓榨。酸味能中和甘蔗的甜膩，並防止甘蔗汁迅速氧化變黑，讓色澤保持翠綠。必須搭配滿滿一袋或一瓶的碎冰，在熱帶氣候下喝起來極其清爽。"
         }
     ]'>
-
         <div class="emoji">🍛</div>
-        <h2>柬埔寨</h2>
-        <h3>點擊查看美食</h3>
-        <p>點擊卡片可瀏覽更多柬埔寨料理</p>
+        <div class="country-title">柬埔寨</div>
+        <div class="country-subtitle">CAMBODIA</div>
+        <div class="terrain-graphics cambodia-map"></div>
+        <div class="country-hint">點擊查看美食 ➔</div>
     </div>
 
-
-    <!-- Vietnam -->
-    <div class="food-card"
-    data-foods='[
-       {
+    <div class="country-frame-btn" data-foods='[
+        {
             "name":"越式麵包",
             "img":"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRWGv_JaU5rf62aY2ufWV7GSjQQOalzu-ApnQ&s",
             "loc":"📍 Taiwan",
             "map":"https://share.google/LZyqwU9nk8VN5kY5d",
             "detailImg":"https://cdn.tgdd.vn/2020/10/CookProduct/0.-1200x674.jpg",
-            "desc":"越南麵包是越南最具代表性的街頭小吃，展現了法式殖民背景與越南本土風味的完美融合。它使用加入了米粉製作的法式長棍麵包，特色是外皮極其酥脆、內裡輕盈柔軟。麵包中間通常會抹上濃郁的豬肝醬與美乃滋，再夾入越式火腿、燻肉，以及清脆的醃蘿蔔絲、小黃瓜、香菜與生辣椒。"
+            "desc":"越南麵包是越南最具代表性的街頭小吃，展現了法式殖民背景與越南本土風味的完美融合。\n\n特色：\n它使用加入了米粉製作的法式長棍麵包，特色是外皮極其酥脆、內裡輕盈柔軟。麵包中間通常會抹上濃郁的豬肝醬與美乃滋，再夾入越式火腿、燻肉，以及清脆的醃蘿蔔絲、小黃瓜、香菜與生辣椒。"
         },
-
         {
             "name":"越南河粉",
             "img":"https://image.vietnam.travel/sites/default/files/styles/top_banner/public/2017-08/best-pho-in-vietnam.jpg?itok=IOnKltTS",
             "loc":"📍 Taiwan",
             "map":"https://share.google/8aWG6Bg3DUB5xAEUB",
             "detailImg":"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR83QtK1ipDBI6lKwoX48rW9lu3qzmg08uY-A&s",
-            "desc":"越南河粉是越南最富盛名的國寶級美食。這道料理的核心在於其清澈卻濃郁的湯頭，通常由牛骨（或雞骨）、烤過的薑、洋蔥以及肉桂、八角、草果等香料長時間熬煮而成。"
+            "desc":"越南河粉是越南最富盛名的國寶級美食。\n\n特色：\n這道料理的核心在於其清澈卻濃郁的湯頭，通常由牛骨（或雞骨）、烤過的薑、洋蔥以及肉桂、八角、草果等香料長時間熬煮而成。"
         },
-
         {
             "name":"越式烤豬排飯",
             "img":"https://i-giadinh.vnecdn.net/2024/03/07/7Honthinthnhphm1-1709800144-8583-1709800424.jpg",
             "loc":"📍 Taiwan",
             "map":"https://share.google/dv8n4ZVGePRmcIoDO",
             "detailImg":"https://checkinvietnam.vtc.vn/media/20210929/images/com-tam-sa-bi-chuong-ha-noi_50w.jpg",
-            "desc":"越式烤豬排飯是越南南方（尤其是胡志明市）最受歡迎的靈魂料理。這道菜的特色在於使用口感紮實的碎米 (Broken Rice)，搭配香氣四溢的香茅烤排骨。"
+            "desc":"越式烤豬排飯是越南南方（尤其是胡志明市）最受歡迎的靈魂料理。\n\n特色：\n這道菜的特色在於使用口感紮實的碎米 (Broken Rice)，搭配香氣四溢的香茅烤排骨。"
         },
-
         {
             "name":"越南煎餅",
             "img":"https://adventure-journey.com/upload/image/banh-xeo.jpg",
             "loc":"📍 Taiwan",
             "map":"https://share.google/Mbv1KKpHmPE19LeIP",
             "detailImg":"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRs9titUunKfZpgeIbGhihijJWTxbm_d9C4hg&s",
-            "desc":"越南煎餅是一款色澤金黃、充滿南洋風情的傳統美食。「Bánh」意為餅，「Xèo」則是形容麵糊淋在熱鍋上發出的「嘶嘶聲」。它的餅皮看起來像蛋皮，但實際上是由米粉、水與椰奶調配而成，並加入薑黃粉賦予其明亮的黃色。"
+            "desc":"越南煎餅是一款色澤金黃、充滿南洋風情的傳統美食。「Bánh」意為餅，「Xèo」則是形容麵糊淋在熱鍋上發出的「嘶嘶聲」。\n\n特色：\n它的餅皮看起來像蛋皮，但實際上是由米粉、水與椰奶調配而成，並加入薑黃粉賦予其明亮的黃色。"
         },
-
         {
             "name":"越式辣麵",
             "img":"https://img.tripi.vn/cdn-cgi/image/width=700,height=700/https://gcs.tripi.vn/public-tripi/tripi-feed/img/482775QDC/anh-mo-ta.png",
             "loc":"📍 Taiwan",
             "map":"https://share.google/XVnN1FnXiIJoKU5xD",
             "detailImg":"https://gcs.tripi.vn/public-tripi/tripi-feed/img/482775IEd/anh-mo-ta.png",
-            "desc":"越南辣麵是近年來在越南年輕族群中極受歡迎的創意料理，靈感源自韓國辛拉麵，但融入了濃厚的越南飲食特色。這道料理最著名的特色就是設有「七級辣度」，挑戰食客對辛辣的極限。"
+            "desc":"越南辣麵是近年來在越南年輕族群中極受歡迎的創意料理，靈感源自韓國辛拉麵，但融入了濃厚的越南飲食特色。\n\n特色：\n這道料理最著名的特色就是設有「七級辣度」，挑戰食客對辛辣的極限。"
         },
-
         {
             "name":"豆腐米線配蝦將",
             "img":"https://img5.thuthuatphanmem.vn/uploads/2021/11/24/hinh-anh-bun-dau-mam-tom-cuc-ngon-va-dep_101743783.jpg",
             "loc":"📍 Taiwan",
             "map":"https://share.google/XVnN1FnXiIJoKU5xD",
             "detailImg":"https://danangtourist.net.vn/uploads/image/images/am-thuc/bun-dau-cho-2-nguoi-tai-met-quan-ha-thanh.jpg",
-            "desc":"豆腐蝦醬麵線是北越河內最具代表性的特色小吃，以其獨特的氣味與豐富的拼盤著稱。這道料理的靈魂在於那小碗呈紫色的發酵蝦醬 (Mắm Tôm)，食用前加入檸檬汁、砂糖與生辣椒攪拌至起泡，味道極其濃郁且開胃。"
+            "desc":"豆腐蝦醬麵線是北越河內最具代表性的特色小吃，以其獨特的氣味與豐富的拼盤著稱。\n\n特色：\n這道料理的靈魂在於那小碗呈紫色的發酵蝦醬 (Mắm Tôm)，食用前加入檸檬汁、砂糖與生辣椒攪拌至起泡，味道極其濃郁且開胃。"
         }
     ]'>
-
         <div class="emoji">🥖</div>
-        <h2>越南</h2>
-        <h3>點擊查看美食</h3>
-        <p>點擊卡片可瀏覽更多越南料理</p>
+        <div class="country-title">越南</div>
+        <div class="country-subtitle">VIETNAM</div>
+        <div class="terrain-graphics vietnam-map"></div>
+        <div class="country-hint">點擊查看美食 ➔</div>
     </div>
 
-
-    <!-- Thailand -->
-    <div class="food-card"
-    data-foods='[
+    <div class="country-frame-btn" data-foods='[
         {
             "name":"泰式湯麵 (ก๋วยเตี๋ยว)",
             "img":"https://picdn.gomaji.com/products/o/115/217115/217115_2.jpg",
             "loc":"📍 Taiwan,Taibei,taoyuan",
             "map":"https://www.google.com/maps/search/泰式+小吃",
             "detailImg":"https://dynamic-media-cdn.tripadvisor.com/media/photo-o/13/e0/c1/f9/thai-french-top-blade.jpg?w=900&h=500&s=1",
-            "desc":"泰國街頭無處不在的「靈魂主食」。湯底： 豬大骨、白蘿蔔、大蒜、香菜根加水熬煮 40 分鐘，用魚露、醬油、冰糖調味。配料： 河粉（或米線）、豆芽菜燙熟後墊在碗底。組合： 豬肉片、肉丸燙熟鋪在麵上，淋上熱湯，撒上蔥花、香菜與炸蒜酥即完成。"
+            "desc":"泰國街頭無處不在的「靈魂主食」。\n\n做法：\n1. 湯底： 豬大骨、白蘿蔔、大蒜、香菜根加水熬煮 40 分鐘，用魚露、醬油、冰糖調味。\n2. 配料： 河粉（或米線）、豆芽菜燙熟後墊在碗底。\n3. 組合： 豬肉片、肉丸燙熟鋪在麵上，淋上熱湯，撒上蔥花、香菜與炸蒜酥即完成。"
         },
-
         {
             "name":"打拋肉 (ผัดกะเพรา)",
             "img":"https://alinalife.tw/wp-content/uploads/2020/06/DSCF7820.jpg",
             "loc":"📍 Taiwan,Taibei,taoyuan",
             "map":"https://www.google.com/maps/search/泰式+小吃",
             "detailImg":"https://thai-awesome.com/uimg/recipe/f90a7d5f-fd52-4032-a1cd-1a13fb1681a4.jpeg",
-            "desc":"這道菜在泰國的地位就像台灣的滷肉飯。正宗的靈魂在於「打拋葉（Holy Basil）」，它帶有獨特的木質與丁香辣氣，跟九層塔風味截然不同。大火快炒逼出蒜香與椒香，鹹香帶辣，是絕對的「白飯殺手」！吃的時候一定要配上一顆邊緣焦脆的半熟荷包蛋才算完美。爆香： 蒜頭與辣椒切末，熱鍋下油爆香。炒肉： 加入豬絞肉，翻炒至變色且鬆散。調味： 加入蠔油、醬油、魚露和少許糖，大火炒勻。起鍋： 關火，立刻加入打拋葉（或九層塔），利用餘溫拌炒至葉片軟化即可。"
+            "desc":"這道菜在泰國的地位就像台灣的滷肉飯。正宗的靈魂在於「打拋葉（Holy Basil）」，它帶有獨特的木質與丁香辣氣，跟九層塔風味截然不同。\n\n大火快炒逼出蒜香與椒香，鹹香帶辣。吃的時候一定要配上一顆邊緣焦脆的半熟荷包蛋才算完美。\n\n做法：\n1. 爆香： 蒜頭與辣椒切末，熱鍋下油爆香。\n2. 炒肉： 加入豬絞肉，翻炒至變色且鬆散。\n3. 調味： 加入蠔油、醬油、魚露和少許糖，大火炒勻。\n4. 起鍋： 關火，立刻加入打拋葉（或九層塔），利用餘溫拌炒至葉片軟化即可。"
         },
-
         {
             "name":"冬蔭功 (ต้มยำกุ้ง)",
             "img":"https://www.sweet-dumpling.com/media/content/c824efcc17cdadf44f914909b26082d2/tom-yum-goong-cover.webp",
             "loc":"📍 Taiwan,Taibei,taoyuan",
             "map":"https://www.google.com/maps/search/泰式+小吃",
             "detailImg":"https://thai-awesome.com/uimg/recipe/9d81f648-d06b-47db-9cca-8e8f26b52e34.jpeg",
-            "desc":"「冬蔭」代表酸辣，「功」代表蝦。這道湯是泰式料理「平衡藝術」的最高境界，將香茅、南薑、檸檬葉這「三劍客」的草本清香發揮到極致。入口先是強烈的酸辣衝擊，隨之而來的是海鮮的鮮甜與香料的餘韻，層次感極強，分為清湯版與加入淡奶的濃湯版。湯底： 蝦頭先下鍋炒出紅油，加水煮滾後撈除蝦頭。香料： 放入香茅段、南薑片、檸檬葉煮 3 分鐘釋放香氣。下料： 加入泰國冬蔭功辣椒膏、菇類、小番茄，最後放鮮蝦煮熟。調味： 加入魚露與少許淡奶拌勻。關火後，才加入檸檬汁（避免變苦）並撒上香菜。"
+            "desc":"「冬蔭」代表酸辣，「功」代表蝦。這道湯是泰式料理「平衡藝術」的最高境界，將香茅、南薑、檸檬葉這「三劍客」的草本清香發揮到極致。\n\n做法：\n1. 湯底： 蝦頭先下鍋炒出紅油，加水煮滾後撈除蝦頭。\n2. 香料： 放入香茅段、南薑片、檸檬葉煮 3 分鐘釋放香氣。\n3. 下料： 加入泰國冬蔭功辣椒膏、菇類、小番茄，最後放鮮蝦煮熟。\n4. 調味： 加入魚露與少許淡奶拌勻。關火後，才加入檸檬汁（避免變苦）並撒上香菜。"
         },
-
         {
             "name":"泰式涼拌海鮮 (ยำทะเล)",
             "img":"https://bkk.com.tw/wp-content/uploads/20210225153842_44.jpg",
             "loc":"📍 Taiwan,Taibei,taoyuan",
             "map":"https://www.google.com/maps/search/泰式+小吃",
             "detailImg":"https://tokyo-kitchen.icook.network/uploads/recipe/cover/462433/beb00c7dfa28bfb1.jpg",
-            "desc":"這道菜最考驗海鮮的熟度與醬汁的平衡，Q彈的蝦子與透抽，拌入大量的紫洋蔥、中芹菜與小番茄，再淋上由新鮮檸檬汁、魚露、生辣椒與大蒜調製的靈魂醬汁。吃起來冰涼爽脆、酸辣帶勁，讓人一口接一口停不下來。備料： 紫洋蔥切絲泡冰水去辛辣；芹菜切段、小番茄對切。海鮮： 蝦仁、花枝等海鮮燙熟，迅速過冰水保持Q彈，徹底瀝乾。醬汁： 蒜末、辣椒末、魚露、檸檬汁與糖，攪拌至糖完全融化。涼拌： 將所有食材與醬汁混合，輕輕抓拌均勻即可上桌。"
+            "desc":"這道菜最考驗海鮮的熟度與醬汁的平衡，Q彈的蝦子與透抽，拌入大量的紫洋蔥、中芹菜與小番茄，再淋上由新鮮檸檬汁、魚露、生辣椒與大蒜調製的靈魂醬汁。吃起來冰涼爽脆、酸辣帶勁！\n\n做法：\n1. 備料： 紫洋蔥切絲泡冰水去辛辣；芹菜切段、小番茄對切。\n2. 海鮮： 蝦仁、花枝等海鮮燙熟，迅速過冰水保持Q彈，徹底瀝乾。\n3. 醬汁： 蒜末、辣椒末、魚露、檸檬汁與糖，攪拌至糖完全融化。\n4. 涼拌： 將所有食材與醬汁混合，輕輕抓拌均勻即可上桌。"
         },
-
         {
-            "name":"泰式炒河粉 (ผัดไทย - Pad Thai)",
+            "name":"泰式炒河粉 (Pad Thai)",
             "img":"https://thai-awesome.com/uimg/recipe/d5a394cd-6c68-464c-ba1d-1ce6822933b3.jpg",
             "loc":"📍 Taiwan,Taibei,taoyuan",
             "map":"https://www.google.com/maps/search/泰式+小吃",
             "detailImg":"https://d3h1lg3ksw6i6b.cloudfront.net/media/image/2020/06/16/83cbfbb30f5f4a31afebfd46c162ed83_Untitled-1.jpg",
-            "desc":"它是泰式料理中「酸、甜、鹹」平衡的極致代表。正宗的 Pad Thai 不用醬油炒，而是利用羅望子果實的天然果酸，結合椰糖的醇厚甜味。入口時有河粉的 Q 彈、豆芽的爽脆、豆腐乾的嚼勁，以及香氣濃郁的花生碎，豐富的口感層次在舌尖炸開，是一道讓人一吃就上癮的魔性料理。靈魂醬汁： 將羅望子醬（酸子膏）、椰糖、魚露以 1:1:1 的比例，加少許水在小鍋中煮融至微稠備用（這是酸甜味的關鍵）。備料： 泰式細河粉先用溫水泡軟（約30分鐘）；準備蝦子、豆乾丁、紅蔥頭末、碎蘿蔔乾、韭菜段、生豆芽、雞蛋。翻炒： 熱鍋下油，爆香紅蔥頭、豆乾丁和蘿蔔乾，接著放入蝦子炒至八分熟。組合： 加入泡軟的河粉與調好的羅望子醬汁，大火翻炒至河粉變軟並吸乾醬汁。將河粉推到鍋邊，在空位打入雞蛋炒碎，最後加入韭菜、生豆芽，大火快速翻炒 10 秒即可起鍋。盛盤： 盤邊擺上花生碎、辣椒粉、糖和一塊檸檬，吃前擠入檸檬汁拌勻。"
+            "desc":"它是泰式料理中「酸、甜、鹹」平衡的極致代表。正宗的 Pad Thai 不用醬油炒，而是利用羅望子果實的天然果酸，結合椰糖的醇厚甜味。\n\n做法：\n1. 靈魂醬汁： 將羅望子醬、椰糖、魚露以 1:1:1 比例加少許水煮融至微稠備用。\n2. 備料： 泰式細河粉先用溫水泡軟（約30分鐘）；準備蝦子、豆乾丁、紅蔥頭末、碎蘿蔔乾、韭菜段、生豆芽、雞蛋。\n3. 翻炒： 熱鍋下油，爆香紅蔥頭、豆乾丁和蘿蔔乾，接著放入蝦子炒至八分熟。\n4. 組合： 加入泡軟的河粉與羅望子醬汁，大火翻炒至河粉變軟吸乾醬汁。將河粉推到鍋邊，打入雞蛋炒碎，最後加入韭菜、生豆芽快速翻炒 10 秒。\n5. 盛盤： 盤邊擺上花生碎、辣椒粉、糖和一塊檸檬，吃前擠入檸檬汁拌勻。"
         },
-
         {
-            "name":"芒果糯米飯 (ข้าวเหนียวมะม่วง - Khao Niew Mamuang)",
+            "name":"芒果糯米飯",
             "img":"https://thai-awesome.com/uimg/recipe/5a651291-da3c-49b2-9be4-dc5bf297222b.jpeg",
             "loc":"📍 Taiwan,Taibei,taoyuan",
             "map":"https://www.google.com/maps/search/泰式+小吃",
             "detailImg":"https://i.ytimg.com/vi/VCNfuDdt0ic/sddefault.jpg",
-            "desc":"這道甜點最絕妙的地方在於「冰與火、鹹與甜」的完美交融。溫熱、帶有一絲微鹹椰香的Q彈糯米飯，搭配冰涼、香甜多汁的熟芒果。椰奶中的微鹹正好襯托出芒果的鮮甜，吃起來完全不膩口。上頭撒上的炸綠豆仁更帶來卡滋卡滋的酥脆感，是去泰國旅遊時天天都想來一份的夢幻逸品！蒸糯米： 長糯米泡水 4 小時以上，瀝乾後放入蒸鍋蒸約 20-25 分鐘至熟透。拌椰漿： 椰奶（約200ml）加入砂糖（4大匙）和少許鹽（半小匙，用來提味和平衡甜度）加熱至融化。趁熱將 2/3 的椰奶倒入剛蒸好的熱糯米飯中，攪拌均勻，蓋上蓋子燜 20-30 分鐘，讓糯米完全吸收椰香。淋醬： 剩下的 1/3 椰奶加入少許太白粉水（或粘米粉水），微火煮到稍微濃稠，作為最後的澆汁。擺盤： 挑選香甜、無絲的熟芒果（如泰國水仙芒果）切大塊，旁邊舀上一勺椰香糯米飯，淋上濃稠椰汁，最後撒上靈魂配料「炸綠豆仁（脆豆）」增加脆脆的口感。"
+            "desc":"這道甜點最絕妙的地方在於「冰與火、鹹與甜」的完美交融。溫熱、帶有一絲微鹹椰香的Q彈糯米飯，搭配冰涼、香甜多汁的熟芒果。椰奶中的微鹹正巧襯托出芒果的鮮甜。\n\n做法：\n1. 蒸糯米： 長糯米泡水 4 小時以上，放入蒸鍋蒸約 20-25 分鐘至熟透。\n2. 拌椰漿： 椰奶（約200ml）加入砂糖（4大匙）和少許鹽（半小匙）加熱至融化。趁熱將 2/3 的椰奶倒入剛蒸好的熱糯米飯中拌勻，蓋上蓋子燜 20-30 分鐘。\n3. 淋醬： 剩下的 1/3 椰奶加入少許太白粉水，微火煮到稍微濃稠作為澆汁。\n4. 擺盤： 熟芒果切大塊，旁邊舀上椰香糯米飯，淋上濃稠椰汁，最後撒上靈魂配料「炸綠豆仁（脆豆）」增加脆感。"
         }
     ]'>
-
         <div class="emoji">🌶️</div>
-        <h2>泰國</h2>
-        <h3>點擊查看美食</h3>
-        <p>點擊卡片可瀏覽更多泰國料理</p>
+        <div class="country-title">泰國</div>
+        <div class="country-subtitle">THAILAND</div>
+        <div class="terrain-graphics thailand-map"></div>
+        <div class="country-hint">點擊查看美食 ➔</div>
     </div>
 
 </div>
-
-
-<!-- First Modal -->
 
 <div id="foodModal" class="modal">
-
     <div class="modal-content">
-
-        <span class="close-btn">&times;</span>
-
+        <span class="close-btn">×</span>
         <h3 id="modalTitle"></h3>
-
         <div id="foodList"></div>
-
     </div>
-
 </div>
-
-
-<!-- Detail Modal -->
 
 <div id="detailModal" class="modal">
-
     <div class="modal-content detail-content">
-
-        <span class="detail-close-btn">&times;</span>
-
+        <span class="detail-close-btn">×</span>
         <img id="detailImage" src="">
-
         <h2 id="detailTitle"></h2>
-
         <p id="detailText"></p>
-
     </div>
-
 </div>
 
-
 <script>
-
-const cards = document.querySelectorAll('.food-card');
-
+const buttons = document.querySelectorAll('.country-frame-btn');
 const modal = document.getElementById('foodModal');
-
 const modalTitle = document.getElementById('modalTitle');
-
 const foodList = document.getElementById('foodList');
-
 const closeBtn = document.querySelector('.close-btn');
 
-
-// OPEN FOOD LIST
-
-cards.forEach(card => {
-
-    card.addEventListener('click', () => {
-
-        const foods = JSON.parse(card.getAttribute('data-foods'));
-
-        const country = card.querySelector('h2').innerText;
-
-        modalTitle.innerText = country + " 美食";
-
+// 點擊 3D 國家按鈕：讀取該按鈕標籤內的 data-foods 完整資料並顯示
+buttons.forEach(btn => {
+    btn.addEventListener('click', () => {
+        const foods = JSON.parse(btn.getAttribute('data-foods'));
+        const country = btn.querySelector('.country-title').innerText;
+        
+        modalTitle.innerText = country + " 精選美食";
         foodList.innerHTML = "";
 
         foods.forEach(food => {
-
             const item = document.createElement('div');
-
             item.classList.add('food-item');
-
             item.innerHTML = `
                 <h4>${food.name}</h4>
-
-                <img 
-                    src="${food.img}" 
-                    class="food-image"
-
-                    data-detailimg="${food.detailImg}"
-                    data-desc="${food.desc}"
-                    data-title="${food.name}"
-                >
-
+                <img src="${food.img}" class="food-image" 
+                     data-detailimg="${food.detailImg}" 
+                     data-desc="${food.desc}" 
+                     data-title="${food.name}">
                 <br>
-
                 <a href="${food.map}" target="_blank">${food.loc}</a>
             `;
-
             foodList.appendChild(item);
-
         });
-
         modal.style.display = 'flex';
-
     });
-
 });
 
+// 關閉第一層美食清單
+closeBtn.addEventListener('click', () => { modal.style.display = 'none'; });
 
-// CLOSE FIRST MODAL
-
-closeBtn.addEventListener('click', () => {
-
-    modal.style.display = 'none';
-
-});
-
-
-// DETAIL MODAL
-
+// 第二層詳細資訊控制（食譜與背景故事）
 const detailModal = document.getElementById('detailModal');
-
 const detailImage = document.getElementById('detailImage');
-
 const detailTitle = document.getElementById('detailTitle');
-
 const detailText = document.getElementById('detailText');
-
 const detailCloseBtn = document.querySelector('.detail-close-btn');
 
-
-// OPEN DETAIL
-
+// 動態事件監聽：點擊清單中的圖片開啟詳細頁面
 document.addEventListener('click', function(e){
-
     if(e.target.classList.contains('food-image')){
-
         detailImage.src = e.target.dataset.detailimg;
-
         detailTitle.innerText = e.target.dataset.title;
-
         detailText.innerText = e.target.dataset.desc;
-
         detailModal.style.display = 'flex';
     }
-
 });
 
+// 關閉第二層詳細頁面
+detailCloseBtn.addEventListener('click', () => { detailModal.style.display = 'none'; });
 
-// CLOSE DETAIL
-
-detailCloseBtn.addEventListener('click', () => {
-
-    detailModal.style.display = 'none';
-
-});
-
-
-// CLICK OUTSIDE TO CLOSE
-
+// 點擊視窗外部（暗色背景處）直接關閉對應的彈窗
 window.addEventListener('click', (event) => {
-
-    if (event.target === modal) {
-
-        modal.style.display = 'none';
-
-    }
-
-    if (event.target === detailModal) {
-
-        detailModal.style.display = 'none';
-
-    }
-
+    if (event.target === modal) modal.style.display = 'none';
+    if (event.target === detailModal) detailModal.style.display = 'none';
 });
-
 </script>
 
 </body>
